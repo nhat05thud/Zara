@@ -1,0 +1,24 @@
+﻿@using Umbraco.Web.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+
+<div class="wrap-categories">
+    <div class="item">
+        <div class="row">
+            @foreach (var item in Model.Children)
+            {
+                var image = item.Value<IPublishedContent>("image");
+                <div class="col-md-3 grid__product-item">
+                    <a href="@item.Url(mode: UrlMode.Absolute)">
+                        <img class="img-fluid" src="@(image != null ? image.GetCropUrl(450, 450, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true") : "https://via.placeholder.com/375x563")" alt="@item.Name">
+                    </a>
+                    <a href="@item.Url(mode: UrlMode.Absolute)" class="product-title">@item.Name</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<div class="wrap-categories">
+    @section Footer {
+        @Html.Partial("~/Views/Partials/Layout/_Footer.cshtml")
+    }
+</div>

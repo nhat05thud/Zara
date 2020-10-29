@@ -1,0 +1,117 @@
+﻿@using Umbraco.Web.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+
+@section styles {
+    <style type="text/css">
+        .layout-header:hover {
+            background: transparent;
+        }
+
+        .layout-header, .layout-header-icons__cart-amount, .layout-header-search-bar__link:hover {
+            color: #fff;
+        }
+
+        .layout-header-icons__icon > svg, .layout-header__mobile-action svg, .layout-logo__image svg {
+            fill: #fff;
+        }
+    </style>
+}
+@{
+    var productLines = Umbraco.AssignedContentItem.Root().DescendantsOfType("productLine").Where(x => x.Value<IEnumerable<IPublishedElement>>("homeSlide").Count() > 0);
+}
+<div id="home-slide__carousel">
+    <div class="home-slide__carousel--wrapper">
+        @foreach (var productLine in productLines)
+        {
+            var homeSlide = productLine.Value<IEnumerable<IPublishedElement>>("homeSlide");
+            <div class="home-slide__carousel--slide">
+                <div class="home__carousel-fullpage" data-index="@productLines.IndexOf(productLine)">
+                    <div class="home__carousel-fullpage--wrapper">
+                        @foreach (var item in homeSlide)
+                        {
+                            var media = item.Value<IPublishedContent>("media");
+                            <div class="home__carousel-fullpage--slide">
+                                <div class="slide-background @(media != null && Path.GetExtension(media.Url(mode: UrlMode.Absolute)) != ".mp4" ? null : "background-video")">
+                                    @if (media != null)
+                                    {
+                                        if (media != null && Path.GetExtension(media.Url(mode: UrlMode.Absolute)) != ".mp4")
+                                        {
+                                            <img class="media-image" alt="" src="@media.GetCropUrl(2400, 1360, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")">
+                                        }
+                                        else
+                                        {
+                                            <video class="media-video" loop muted autoplay playsinline>
+                                                <source src="@media.Url(mode: UrlMode.Absolute)" type="video/mp4">
+                                            </video>
+                                        }
+                                    }
+                                </div>
+                                <div class="slide-content">
+                                    @if (!string.IsNullOrEmpty(item.Value<string>("title")))
+                                    {
+                                        <h2 class="slide__content-title">@item.Value("title")</h2>
+                                        if (!string.IsNullOrEmpty(item.Value<string>("description")))
+                                        {
+                                            <div class="slide__content-subtitle">
+                                                @item.Value("description")
+                                            </div>
+                                        }
+                                        if (item.Value<IPublishedContent>("link") != null)
+                                        {
+                                            <a class="slide__content-button" href="@(item.Value<IPublishedContent>("link").Url(mode: UrlMode.Absolute))">Xem thêm</a>
+                                        }
+                                    }
+                                </div>
+                                <button class="pager-next">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="pager-next-svg" viewBox="0 0 32 32">
+                                        <path d="M13 9l8 7.5-8 7.5-.8-.9 7.3-6.6-7.3-6.6.8-.9z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        }
+                        @{
+                            var contact = Umbraco.AssignedContentItem.Root().DescendantOfType("contact");
+                        }
+                        @if (contact != null)
+                        {
+                            var social = contact.Value<IEnumerable<IPublishedElement>>("social");
+                            <div class="home__carousel-fullpage--slide">
+                                <div class="slide-content none-background">
+                                    <h2 class="slide__content-title">Thông tin liên hệ</h2>
+                                    <div class="slide__content-subtitle">
+                                        <p>Địa chỉ: @contact.Value("address")</p>
+                                        <p>Số điện thoại: <a href="tel:@contact.Value("phone")">@contact.Value("phone")</a></p>
+                                        <p>Email: <a href="mailto:@contact.Value("email")">@contact.Value("email")</a></p>
+                                    </div>
+                                </div>
+                                <div class="last-slide-footer">
+                                    <div class="text-center social">
+                                        @if (social != null)
+                                        {
+                                            foreach (var item in social)
+                                            {
+                                                <a href="@item.Value("link")" class="@(!string.IsNullOrEmpty(item.Value<string>("icon")) ? "has-icon" : "none-icon")" target="_blank">
+                                                    @if (!string.IsNullOrEmpty(item.Value<string>("icon")))
+                                                    {
+                                                        @Html.Raw(item.Value("icon"));
+                                                    }
+                                                    else
+                                                    {
+                                                        @Html.Raw(item.Value("svg"));
+                                                    }
+                                                </a>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+</div>

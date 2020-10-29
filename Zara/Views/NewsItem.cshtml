@@ -1,0 +1,42 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@{
+    var relatedNews = Model.Parent.Children().Where(x => x.Id != Model.Id).Take(10);
+}
+<div class="layout__content">
+    <main class="layout__main" id="main">
+        <article class="layout__article">
+            <div class="espot-content">
+                <header>
+                    <h2 class="head">@Model.Name</h2>
+                </header>
+                <article class="more-info-content">
+                    @Model.Value("content")
+                </article>
+            </div>
+            @if (relatedNews.Count() > 0)
+            {
+                <div class="related-news">
+                    <h3>Tin liên quan</h3>
+                    <ul>
+                        @foreach (var item in relatedNews)
+                        {
+                            <li>
+                                <a href="@item.Url(mode: UrlMode.Absolute)">
+                                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-right-circle-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-11.5.5a.5.5 0 0 1 0-1h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5z" />
+                                    </svg> @item.Name
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+        </article>
+    </main>
+</div>
+<div class="wrap-categories">
+    @section Footer {
+        @Html.Partial("~/Views/Partials/Layout/_Footer.cshtml")
+    }
+</div>
+

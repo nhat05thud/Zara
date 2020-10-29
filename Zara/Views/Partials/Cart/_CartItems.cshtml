@@ -1,0 +1,107 @@
+﻿@using Zara.Controllers
+@using Zara.ClassHelper
+@inherits UmbracoViewPage<Zara.Models.CartViewModel>
+@{
+    var home = Umbraco.AssignedContentItem.Root();
+    var checkOut = Umbraco.AssignedContentItem.Root().FirstChildOfType("checkOut");
+}
+@if (TempData["UpdateCartStatus"] != null)
+{
+    <div class="has-success" style="margin-bottom: 10px;">@TempData["UpdateCartStatus"]</div>
+}
+@if (Model.CartModels.Count > 0)
+{
+    <div class="row has-vertical-line-spacer-lg-up">
+        <div class="cart-products__main-section col-auto">
+            <h1 class="cart-products__main-title">Có @Model.CartModels.Sum(x => x.Quantity) sản phẩm</h1>
+            @using (Html.BeginUmbracoForm<CartController>("UpdateCart", FormMethod.Post, new { @class = "form", id = "requestForm" }))
+            {
+                <input type="hidden" name="CouponCode" value="@Model.CouponCode" />
+                foreach (var item in Model.CartModels)
+                {
+                    <div class="cart-products__product cart_item">
+                        <input type="hidden" class="input-productId" value="@item.ProductId" />
+                        <input type="hidden" class="input-size" value="@item.Size" />
+                        <div class="d-flex align-items-md-center flex-row flex-wrap">
+                            <div class="cart-products__product-section cart-products__product-img">
+                                <a href="@item.ProductUrl"><img src="@item.ThumbnailPath" alt="@item.ProductName" /></a>
+                            </div>
+                            <div class="cart-products__product-section cart-products__product-section--is-large">
+                                <a href="@item.ProductUrl">@item.ProductName</a>
+                                <p>Size: @item.Size</p>
+                                <p>@(String.Format("{0:n0}", item.ProductPrice)) @home.Value("currency")</p>
+                            </div>
+                            <div class="cart-products__product-section">
+                                <label>Số lượng:</label>
+                                <div class="quantity">
+                                    <input class="input-quantity" type="number" min="1" step="1" value="@item.Quantity" />
+                                    <div class="quantity-nav">
+                                        <div class="quantity-button quantity-up">+</div>
+                                        <div class="quantity-button quantity-down">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cart-products__product-section text-center">
+                                <h5>Thành tiền</h5>
+                                <p>@(String.Format("{0:n0}", item.SubTotal)) @home.Value("currency")</p>
+                            </div>
+                        </div>
+                        <span class="remove-item" onclick="cart.handleRemoveItem(this)">
+                            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+                            </svg> Xóa
+                        </span>
+                    </div>
+                }
+                <button type="submit" class="btn--has-border-black text-uppercase" style="margin-top: 30px">Cập nhật giỏ hàng</button>
+                <div class="loading_div"></div>
+            }
+        </div>
+        <div class="cart-products__side-section col-auto">
+            <h1 class="cart-products__main-title text-uppercase">Đơn hàng của bạn</h1>
+            <div class="cart_totals__main-section">
+                <div class="cart_totals__main-section-row">
+                    <div class="d-flex justify-content-between cart-subtotal">
+                        <h5>Tổng tiền</h5>
+                        <span>@(String.Format("{0:n0}", Model.CartModels.Sum(x => x.SubTotal))) @home.Value("currency")</span>
+                    </div>
+                </div>
+                <div class="cart_totals__main-section-row">
+                    <div class="d-flex flex-wrap justify-content-between cart-coupon">
+                        <h5 style="width: 100%;">Mã khuyến mãi</h5>
+                        <div class="input-group mb-3 _coupon">
+                            <input type="text" class="form-control" id="coupon__value" value="@Model.CouponCode">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" onclick="cart.applyCoupon(this, @home.Id)" type="button">Thêm</button>
+                            </div>
+                        </div>
+                        <span class="remove-item" onclick="cart.handleRemoveCoupon(@home.Id)" @(string.IsNullOrEmpty(Model.CouponCode) ? "style=display:none;" : null)>
+                            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+                            </svg> Xóa mã giảm giá
+                        </span>
+                    </div>
+                </div>
+                <div class="cart_totals__main-section-row">
+                    <div class="d-flex justify-content-between cart-subtotal">
+                        <h5>Giảm</h5>
+                        <span><span id="percent-count">@(Model.CouponPercent > 0 ? Model.CouponPercent : 0)</span>%</span>
+                    </div>
+                </div>
+                <div class="cart_totals__main-section-row">
+                    <div class="d-flex justify-content-between cart-subtotal">
+                        <h5>Thành tiền</h5>
+                        <span><span id="total-price">@(String.Format("{0:n0}", Model.TotalPrice))</span> @home.Value("currency")</span>
+                    </div>
+                </div>
+                <div class="checkout">
+                    <a href="@(checkOut != null ? checkOut.Url(mode: UrlMode.Absolute) : "#")">@(checkOut != null ? checkOut.Name : "Thanh toán")</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    @Html.Action("RenderEmptyCart", "Cart")
+}

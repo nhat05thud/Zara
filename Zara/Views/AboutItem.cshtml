@@ -1,0 +1,22 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+
+<div class="layout__content">
+    <main class="layout__main" id="main">
+        <article class="layout__article">
+            <div class="espot-content">
+                <header>
+                    <h2 class="head">@Model.Name</h2>
+                </header>
+                <article class="more-info-content">
+                    @Model.Value("content")
+                </article>
+            </div>
+        </article>
+    </main>
+</div>
+<div class="wrap-categories">
+    @section Footer {
+        @Html.Partial("~/Views/Partials/Layout/_Footer.cshtml")
+    }
+</div>
+

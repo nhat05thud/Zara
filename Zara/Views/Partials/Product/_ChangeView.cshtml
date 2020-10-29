@@ -1,0 +1,81 @@
+﻿@using Zara.ClassHelper
+@using Umbraco.Web.Models
+@model Zara.Models.ProductViewModel
+
+@if (Model.Page != null)
+{
+    var home = Model.Page.Root();
+    var cate = Model.Page;
+    <div class="row">
+        @foreach (var item in cate.Children)
+        {
+            var images = item.Value<IEnumerable<IPublishedContent>>("images");
+            <div class="@(ViewBag.Layout == 2 ? item.Value("productColumn").Equals(AppConstant.Column_12) || item.Value("productColumn").Equals(AppConstant.Column_6) ? "col-md-12" : "col-md-6" : item.Value("productColumn").Equals(AppConstant.Column_12) ? "col-md-12" : item.Value("productColumn").Equals(AppConstant.Column_6) ? "col-md-6" : "col-md-3") grid__product-item @(ViewBag.Layout == 2 ? "text-center" : null)">
+                <a href="@item.Url(mode: UrlMode.Absolute)">
+                    @if (images != null)
+                    {
+                        if (item.Value("productColumn").Equals(AppConstant.Column_12))
+                        {
+                            <picture>
+                                <source srcset="@images.First().GetCropUrl(450, 675, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" media="(max-width: 480px)">
+                                <source srcset="@images.First().GetCropUrl(992, 744, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" media="(max-width: 768px)">
+                                <source srcset="@images.First().GetCropUrl(2400, 1360, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")">
+                                <img class="img-fluid" srcset="@images.First().GetCropUrl(2400, 1360, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" alt="@item.Name">
+                            </picture>
+                        }
+                        else if (item.Value("productColumn").Equals(AppConstant.Column_6))
+                        {
+                            if (ViewBag.Layout == 2)
+                            {
+                                <picture>
+                                    <source srcset="@images.First().GetCropUrl(450, 675, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" media="(max-width: 480px)">
+                                    <source srcset="@images.First().GetCropUrl(992, 744, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" media="(max-width: 768px)">
+                                    <source srcset="@images.First().GetCropUrl(2400, 1360, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")">
+                                    <img class="img-fluid" srcset="@images.First().GetCropUrl(2400, 1360, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" alt="@item.Name">
+                                </picture>
+                            }
+                            else
+                            {
+                                <picture>
+                                    <source srcset="@images.First().GetCropUrl(450, 675, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" media="(max-width: 480px)">
+                                    <source srcset="@images.First().GetCropUrl(750, 536, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")">
+                                    <img class="img-fluid" srcset="@images.First().GetCropUrl(750, 536, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" alt="@item.Name">
+                                </picture>
+                            }
+                        }
+                        else if (item.Value("productColumn").Equals(AppConstant.Column_3))
+                        {
+                            if (ViewBag.Layout == 2)
+                            {<picture>
+                                    <source srcset="@images.First().GetCropUrl(450, 675, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" media="(max-width: 480px)">
+                                    <source srcset="@images.First().GetCropUrl(850, 1275, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")">
+                                    <img class="img-fluid" srcset="@images.First().GetCropUrl(850, 1275, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" alt="@item.Name">
+                                </picture>
+                            }
+                            else
+                            {
+                                <img class="img-fluid" src="@images.First().GetCropUrl(450, 675, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" alt="@item.Name">
+                            }
+                        }
+                    }
+                </a>
+                @if (!item.Value<bool>("isHideInformation"))
+                {
+                    <span class="tag">@item.Value("tag")</span>
+                    <a href="@item.Url(mode: UrlMode.Absolute)" class="product-title">@item.Name</a>
+                    <p class="price">
+                        @if (item.Value<decimal>("oldPrice") > 0)
+                        {
+                            <span class="old-price">@(String.Format("{0:n0}", item.Value<decimal>("oldPrice"))) @home.Value("currency")</span>
+                            <span class="current-price">@(String.Format("{0:n0}", item.Value<decimal>("price"))) @home.Value("currency")</span>
+                        }
+                        else
+                        {
+                            @(String.Format("{0:n0}", item.Value<decimal>("price"))) @home.Value("currency")
+                        }
+                    </p>
+                }
+            </div>
+        }
+    </div>
+}

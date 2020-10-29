@@ -1,0 +1,43 @@
+﻿@inherits UmbracoViewPage<Zara.Models.ContactModel>
+@{
+    if (!string.IsNullOrEmpty(Model.ErrorMsg))
+    {
+        <div id="divUpdateMessage">
+            @Model.ErrorMsg
+        </div>
+    }
+}
+@Html.AntiForgeryToken()
+<div class="wrap-send">
+    <div class="contact-w">
+        <div class="contact-input">
+            @Html.TextBoxFor(model => model.Name, new { @class = "contact-textbox", placeholder = "Họ & Tên" })
+            @Html.ValidationMessageFor(x => x.Name)
+        </div>
+    </div>
+    <div class="contact-w">
+        <div class="contact-input">
+            @Html.TextBoxFor(model => model.Email, new { @class = "contact-textbox", placeholder = "Email" })
+            @Html.ValidationMessageFor(x => x.Email)
+        </div>
+    </div>
+    <div class="contact-w">
+        <div class="contact-input">
+            @Html.TextBoxFor(model => model.Phone, new { @class = "contact-textbox", placeholder = "Số điện thoại" })
+            @Html.ValidationMessageFor(x => x.Phone)
+        </div>
+    </div>
+    <div class="contact-w">
+        <div class="contact-input">
+            @Html.TextAreaFor(model => model.Message, new { @class = "contact-area", placeholder = "Nội dung" })
+            @Html.ValidationMessageFor(x => x.Message)
+        </div>
+    </div>
+    <div class="contact-w">
+        <div class="contact-btn">
+            <input type="submit" class="button-btn" name="" value="Gửi" />
+        </div>
+    </div>
+</div>
+@Html.HiddenFor(x => x.CultureLcid)
+<div class="loading_div"></div>

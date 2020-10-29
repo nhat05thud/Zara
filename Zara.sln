@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30225.117
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zara", "Zara\Zara.csproj", "{DA55C741-4D27-495F-A9C3-F70F3A76F90F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DA55C741-4D27-495F-A9C3-F70F3A76F90F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA55C741-4D27-495F-A9C3-F70F3A76F90F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA55C741-4D27-495F-A9C3-F70F3A76F90F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA55C741-4D27-495F-A9C3-F70F3A76F90F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0EAF676D-2E93-4F19-9615-30E19BD879EC}
+	EndGlobalSection
+EndGlobal

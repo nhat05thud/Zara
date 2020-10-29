@@ -1,0 +1,209 @@
+﻿@using Umbraco.Web.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@{
+    var home = Umbraco.AssignedContentItem.Root();
+    var images = Model.Value<IEnumerable<IPublishedContent>>("images");
+    var sizeList = Model.Value<IEnumerable<IPublishedElement>>("size");
+}
+<section id="product">
+    <div class="product-main">
+        <div class="product-image-section">
+            @if (images != null)
+            {
+                foreach (var item in images)
+                {
+                    <div class="media-wrap image-wrap">
+                        <img class="img-fluid" src="@item.Url(mode: UrlMode.Absolute)" alt="@Model.Name" />
+                    </div>
+                }
+                <div class="images-swiper swiper-container">
+                    <div class="swiper-wrapper">
+                        @foreach (var item in images)
+                        {
+                            <div class="swiper-slide">
+                                <picture>
+                                    <source srcset="@item.GetCropUrl(450, 675, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" media="(max-width: 480px)">
+                                    <source srcset="@item.GetCropUrl(357, 536, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" media="(max-width: 768px)">
+                                    <source srcset="@item.GetCropUrl(357, 536, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")">
+                                    <img class="img-fluid" srcset="@item.GetCropUrl(357, 536, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" alt="@Model.Name">
+                                </picture>
+                            </div>
+                        }
+                    </div>
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next"></div>
+                </div>
+            }
+        </div>
+        <div class="product-info-section">
+            <div class="product-info-section__content">
+                <h1>@Model.Name</h1>
+                <p class="price">
+                    @if (Model.Value<decimal>("oldPrice") > 0)
+                    {
+                        <span class="old-price">@(String.Format("{0:n0}", Model.Value<decimal>("oldPrice"))) @home.Value("currency")</span>
+                        <span class="current-price">@(String.Format("{0:n0}", Model.Value<decimal>("price"))) @home.Value("currency")</span>
+                    }
+                    else
+                    {
+                        @(String.Format("{0:n0}", Model.Value<decimal>("price"))) @home.Value("currency")
+                    }
+                </p>
+                <div class="desc">
+                    @Model.Value("description")
+                </div>
+                <div class="size-list">
+                    @if (sizeList != null)
+                    {
+                        foreach (var item in sizeList)
+                        {
+                            <label class="product-size @(item.Value<bool>("isOutStock") ? "disabled" : null)"><input type="radio" @(item.Value<bool>("isOutStock") ? "disabled=disabled" : null) name="ProductSize" value="@item.Value("title")" /> <span>@item.Value("title")</span></label>
+                        }
+                    }
+                </div>
+                <button id="cart-button" data-id="@Model.Id" onclick="cart.handleAddtoCart(this)">Thêm</button>
+                <ul class="all-note">
+                    @if (!string.IsNullOrEmpty(Model.Value<string>("chooseSize")))
+                    {
+                        <li>
+                            <a data-toggle="modal" data-target="#chooseSize">
+                                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-right-circle-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-11.5.5a.5.5 0 0 1 0-1h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5z" />
+                                </svg> Hướng dẫn chọn cỡ
+                            </a>
+                        </li>
+                    }
+                    <li>
+                        <a data-toggle="modal" data-target="#paymentMethod">
+                            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-right-circle-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-11.5.5a.5.5 0 0 1 0-1h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5z" />
+                            </svg> Hình thức thanh toán, phí vận chuyển
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="clr"></div>
+    <div id="out-of-fixed">
+        @{
+            var mix = Model.Value<IEnumerable<IPublishedContent>>("mix");
+        }
+        @if (mix != null)
+        {
+            <div class="mix-product">
+                <div class="out-title">
+                    <h2>Mặc cùng</h2>
+                    <span>Có @mix.Count() sản phẩm</span>
+                </div>
+                <div class="product-swiper swiper-container">
+                    <div class="swiper-wrapper">
+                        @foreach (var item in mix)
+                        {
+                            <div class="swiper-slide grid__product-item">
+                                <a href="@item.Url(mode: UrlMode.Absolute)">
+                                    @if (images != null)
+                                    {
+                                        <img class="img-fluid" src="@images.First().GetCropUrl(450, 675, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" alt="@item.Name">
+                                    }
+                                </a>
+                                <span class="tag">@item.Value("tag")</span>
+                                <a href="@item.Url(mode: UrlMode.Absolute)" class="product-title">@item.Name</a>
+                                <p class="price">
+                                    @if (item.Value<decimal>("oldPrice") > 0)
+                                    {
+                                        <span class="old-price">@(String.Format("{0:n0}", item.Value<decimal>("oldPrice"))) @home.Value("currency")</span>
+                                        <span class="current-price">@(String.Format("{0:n0}", item.Value<decimal>("price"))) @home.Value("currency")</span>
+                                    }
+                                    else
+                                    {
+                                        @(String.Format("{0:n0}", item.Value<decimal>("price"))) @home.Value("currency")
+                                    }
+                                </p>
+                            </div>
+                        }
+                    </div>
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next"></div>
+                </div>
+            </div>
+        }
+        @{
+            var anotherProduct = Model.Parent.Children().Where(x => x.Id != Model.Id).Take(8);
+        }
+        @if (anotherProduct.Count() > 0)
+        {
+            <div class="mix-product">
+                <div class="out-title">
+                    <h2>Sản phẩm tương tự</h2>
+                    <span>Có @anotherProduct.Count() sản phẩm</span>
+                </div>
+                <div class="product-swiper swiper-container">
+                    <div class="swiper-wrapper">
+                        @foreach (var item in anotherProduct)
+                        {
+                            <div class="swiper-slide grid__product-item">
+                                <a href="@item.Url(mode: UrlMode.Absolute)">
+                                    @if (images != null)
+                                    {
+                                        <img class="img-fluid" src="@images.First().GetCropUrl(450, 675, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" alt="@item.Name">
+                                    }
+                                </a>
+                                <span class="tag">@item.Value("tag")</span>
+                                <a href="@item.Url(mode: UrlMode.Absolute)" class="product-title">@item.Name</a>
+                                <p class="price">
+                                    @if (item.Value<decimal>("oldPrice") > 0)
+                                    {
+                                        <span class="old-price">@(String.Format("{0:n0}", item.Value<decimal>("oldPrice"))) @home.Value("currency")</span>
+                                        <span class="current-price">@(String.Format("{0:n0}", item.Value<decimal>("price"))) @home.Value("currency")</span>
+                                    }
+                                    else
+                                    {
+                                        @(String.Format("{0:n0}", item.Value<decimal>("price"))) @home.Value("currency")
+                                    }
+                                </p>
+                            </div>
+                        }
+                    </div>
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next"></div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+<div class="wrap-categories">
+    @section Footer {
+        @Html.Partial("~/Views/Partials/Layout/_Footer.cshtml")
+        <div class="modal fade product-note__modal" id="paymentMethod" tabindex="-1">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Hình thức thanh toán, phí vận chuyển</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        @home.DescendantOfType("product").Value("paymentMethod")
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade product-note__modal" id="chooseSize" tabindex="-1">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Hướng dẫn chọn cỡ</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        @Model.Value("chooseSize")
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

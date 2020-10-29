@@ -1,0 +1,119 @@
+﻿@using Zara.ClassHelper
+@using Umbraco.Web.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@{
+    var home = Umbraco.AssignedContentItem.Root();
+    var ListProducts = Model.Value<IEnumerable<IPublishedElement>>("listProducts");
+}
+
+@if (ListProducts != null)
+{
+    <div class="wrap-categories">
+        @foreach (var product in ListProducts)
+        {
+            var listImages = product.Value<IEnumerable<IPublishedElement>>("listImage");
+            var listProducts = product.Value<IEnumerable<IPublishedContent>>("listProducts");
+            <div class="item">
+                @if (listImages != null && listImages.Any())
+                {
+                <div class="row">
+                    @foreach (var item in listImages)
+                    {
+                        var images = item.Value<IEnumerable<IPublishedContent>>("image");
+                        var links = item.Value<IEnumerable<IPublishedContent>>("link");
+                        if (item.Value<string>("layoutColumn").Equals(AppConstant.Column_12))
+                        {
+                            <div class="col-md-12 grid__product-item">
+                                <a href="@(links != null ? links.FirstOrDefault()?.Url(mode: UrlMode.Absolute) : "javascript:void(0);")">
+                                    @if (images != null && images.Any())
+                                    {
+                                        <picture>
+                                            <source srcset="@images.First().GetCropUrl(450, 675, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" media="(max-width: 480px)">
+                                            <source srcset="@images.First().GetCropUrl(992, 744, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" media="(max-width: 768px)">
+                                            <source srcset="@images.First().GetCropUrl(2400, 1360, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")">
+                                            <img class="img-fluid" srcset="@images.First().GetCropUrl(2400, 1360, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" alt="@(links != null ? links.FirstOrDefault().Name : "")">
+                                        </picture>
+                                    }
+                                </a>
+                            </div>
+                        }
+                        else if (item.Value<string>("layoutColumn").Equals(AppConstant.Column_3))
+                        {
+                            if (images != null)
+                            {
+                                foreach (var child in images)
+                                {
+                                    <div class="col-md-3 col-sm-6 grid__product-item">
+                                        <a href="@(links != null ? links.Count() > images.IndexOf(child) ? links.ElementAt(images.IndexOf(child)).Url(mode: UrlMode.Absolute) : "javascript:void(0);" : "javascript:void(0);")">
+                                            @if (child != null)
+                                            {
+                                                <img class="img-fluid" src="@child.GetCropUrl(450, 675, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" alt="@(links != null ? links.FirstOrDefault().Name : "")">
+                                            }
+                                        </a>
+                                    </div>
+                                }
+                            }
+                        }
+                        else if (item.Value<string>("layoutColumn").Equals(AppConstant.Column_2))
+                        {
+                            if (images != null)
+                            {
+                                foreach (var child in images)
+                                {
+                                    <div class="col-md-2 col-sm-6 grid__product-item">
+                                        <a href="@(links != null ? links.Count() > images.IndexOf(child) ? links.ElementAt(images.IndexOf(child)).Url(mode: UrlMode.Absolute) : "javascript:void(0);" : "javascript:void(0);")">
+                                            @if (child != null)
+                                            {
+                                                <picture>
+                                                    <source srcset="@child.GetCropUrl(450, 675, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" media="(max-width: 768px)">
+                                                    <source srcset="@child.GetCropUrl(275, 405, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")">
+                                                    <img class="img-fluid" srcset="@child.GetCropUrl(275, 405, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" alt="@(links != null ? links.FirstOrDefault().Name : "")">
+                                                </picture>
+                                            }
+                                        </a>
+                                    </div>
+                                }
+                            }
+                        }
+                    }
+                </div>
+                }
+                @if (listProducts != null)
+                {
+                    <div class="row">
+                        @foreach (var item in listProducts)
+                        {
+                            var images = item.Value<IEnumerable<IPublishedContent>>("images");
+                            <div class="col-md-3 col-sm-6 grid__product-item">
+                                <a href="@item.Url(mode: UrlMode.Absolute)">
+                                    @if (images != null)
+                                    {
+                                        <img class="img-fluid" src="@images.First().GetCropUrl(450, 675, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" alt="@item.Name">
+                                    }
+                                </a>
+                                <span class="tag">New</span>
+                                <a href="@item.Url(mode: UrlMode.Absolute)" class="product-title">@item.Name</a>
+                                <p class="price">
+                                    @if (item.Value<decimal>("oldPrice") > 0)
+                                    {
+                                        <span class="old-price">@(String.Format("{0:n0}", item.Value<decimal>("oldPrice"))) @home.Value("currency")</span>
+                                        <span class="current-price">@(String.Format("{0:n0}", item.Value<decimal>("price"))) @home.Value("currency")</span>
+                                    }
+                                    else
+                                    {
+                                        @(String.Format("{0:n0}", item.Value<decimal>("price"))) @home.Value("currency")
+                                    }
+                                </p>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+<div class="wrap-categories">
+    @section Footer {
+        @Html.Partial("~/Views/Partials/Layout/_Footer.cshtml")
+    }
+</div>

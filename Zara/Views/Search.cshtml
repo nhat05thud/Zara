@@ -1,0 +1,75 @@
+﻿@using Zara.ClassHelper
+@using Umbraco.Web.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@{
+    var searchQuery = Request.QueryString["keyword"];
+    var home = Umbraco.AssignedContentItem.Root();
+    var products = home.DescendantsOfType("productItem");
+}
+@section styles {
+    <style type="text/css">
+        .layout-header-icons__search, .layout-header-search-bar {
+            display: none;
+        }
+    </style>
+}
+<div class="wrap-categories">
+    <div class="search">
+        <div id="search-container">
+            <form action="@Model.Url(mode: UrlMode.Absolute)" method="get">
+                <input type="text" name="keyword" value="@Request.QueryString["keyword"]">
+            </form>
+        </div>
+        <span class="cancel-search" onclick="@(!string.IsNullOrEmpty(searchQuery) ? "window.location.href='" + home.Url(mode: UrlMode.Absolute) + "'" : "window.history.go(-1); return false;")">
+            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+            </svg>
+        </span>
+    </div>
+    <div class="search-result" style="margin-top: 30px">
+        @{
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                products = products.Where(x => x.Name.ToLower().Contains(searchQuery.ToLower()) || searchQuery.ToLower().Contains(x.Name.ToLower()));
+                <p>Kết quả tìm kiếm cho từ khóa: <strong>@searchQuery</strong></p><br />
+                if (products.Any())
+                {
+                    <div class="row">
+                        @foreach (var item in products)
+                        {
+                            var images = item.Value<IEnumerable<IPublishedContent>>("images");
+                            <div class="col-md-3 grid__product-item">
+                                <a href="@item.Url(mode: UrlMode.Absolute)">
+                                    @if (images != null)
+                                    {
+                                        <img class="img-fluid" src="@images.First().GetCropUrl(450, 675, imageCropMode:ImageCropMode.BoxPad, furtherOptions: "&bgcolor=fff&slimmage=true")" alt="@item.Name">
+                                    }
+                                </a>
+                                <span class="tag">@item.Value("tag")</span>
+                                <a href="@item.Url(mode: UrlMode.Absolute)" class="product-title">@item.Name</a>
+                                <p class="price">
+                                    @if (item.Value<decimal>("oldPrice") > 0)
+                                    {
+                                        <span class="old-price">@(String.Format("{0:n0}", item.Value<decimal>("oldPrice"))) @home.Value("currency")</span>
+                                        <span class="current-price">@(String.Format("{0:n0}", item.Value<decimal>("price"))) @home.Value("currency")</span>
+                                    }
+                                    else
+                                    {
+                                        @(String.Format("{0:n0}", item.Value<decimal>("price"))) @home.Value("currency")
+                                    }
+                                </p>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center" style="padding: 30px 0;">
+                        <i>Không có sản phẩm phù hợp cho từ khóa: <strong>@searchQuery</strong></i>
+                    </div>
+                }
+            }
+        }
+    </div>
+</div>
+

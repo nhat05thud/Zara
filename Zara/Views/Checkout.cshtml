@@ -1,0 +1,82 @@
+﻿@using Zara.Models
+@using Zara.ClassHelper
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@{
+}
+    <div class="wrap-categories">
+        <div class="container">
+            @if (TempData["ErrorMessage"] != null || TempData["SuccessMessage"] != null)
+            {
+                <div class="layout__content">
+                    <main class="layout__main" id="main">
+                        <article class="layout__article">
+                            <div class="espot-content">
+                                @if (TempData["SuccessMessage"] != null)
+                                {
+                                    <header>
+                                        <h2 class="head">Thành công</h2>
+                                    </header>
+                                    <article class="more-info-content">
+                                        @if (!string.IsNullOrEmpty(Model.Value<string>("successContent")))
+                                        {
+                                            <text>@Model.Value("successContent")</text>
+                                        }
+                                        else
+                                        {
+                                            <p>Bạn đã đặt hàng thành công, <a href="/">Trở về trang chủ</a></p>
+                                        }
+                                    </article>
+                                }
+                                else
+                                {
+                                    <header>
+                                        <h2 class="head">Thất bại</h2>
+                                    </header>
+                                    <article class="more-info-content">
+                                        @if (!string.IsNullOrEmpty(Model.Value<string>("failureContent")))
+                                        {
+                                            <text>@Model.Value("failureContent")</text>
+                                        }
+                                        else
+                                        {
+                                            <p>Đã có lỗi xảy ra trong quá trình đặt hàng, vui lòng thử lại sau.</p>
+                                        }
+                                    </article>
+                                }
+                            </div>
+                        </article>
+                    </main>
+                </div>
+            }
+            else
+            {
+                <h1 class="main-title text-center text-uppercase" style="margin-bottom: 30px; font-weight: bold;">@Model.Name</h1>
+                if (Session[AppConstant.SESSION_CART_ITEMS] != null)
+                {
+                    var cartObject = (CartSession)Session[AppConstant.SESSION_CART_ITEMS];
+                    if (cartObject.Carts != null)
+                    {
+                        @Html.Partial("~/Views/Partials/CheckOut/_CheckOut.cshtml", new CheckOutModel
+                        {
+                           CultureLcid = System.Globalization.CultureInfo.CurrentUICulture.LCID,
+                           Carts = cartObject.Carts,
+                           CouponCode = cartObject.CouponCode,
+                           CouponPercent = cartObject.CouponPercent,
+                           TotalPrice = cartObject.TotalPrice
+                        })
+                    }
+                    else
+                    {
+                        @Html.Action("RenderEmptyCart", "Cart")
+                    }
+                }
+                else
+                {
+                    @Html.Action("RenderEmptyCart", "Cart")
+                }
+            }
+        </div>
+        @section Footer {
+            @Html.Partial("~/Views/Partials/Layout/_Footer.cshtml")
+        }
+    </div>

@@ -1,0 +1,16 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@{
+    var home = Umbraco.AssignedContentItem.Root();
+}
+@section UtilitiesHeader {
+    <div id="product-filter">
+        Hiển thị <a class="change-view" data-value="2" data-id="@Umbraco.AssignedContentItem.Id">2</a> <a class="change-view active" data-value="4" data-id="@Umbraco.AssignedContentItem.Id">4</a>
+    </div>
+}
+<div class="wrap-categories">
+    @{ Html.RenderAction("RenderProduct", "Product", new { layout = 4, id = Umbraco.AssignedContentItem.Id }); }
+    
+    @section Footer {
+        @Html.Partial("~/Views/Partials/Layout/_Footer.cshtml")
+    }
+</div>

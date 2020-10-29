@@ -1,0 +1,6 @@
+﻿@using Zara.Controllers
+@inherits UmbracoViewPage<Zara.Models.CheckOutModel>
+@using (Html.BeginUmbracoForm<CheckOutController>("HandleCheckOut", FormMethod.Post, new { @class = "form", id = "requestForm" }))
+{
+    @Html.Partial("~/Views/Partials/CheckOut/_Form.cshtml", Model)
+}
